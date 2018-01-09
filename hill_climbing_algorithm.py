@@ -48,6 +48,6 @@ def create_gaussian_neighbourhood_generator(neighbours_count, sigma, mean=0.0):
         random_numbers = numpy.random.normal(mean, sigma, neighbours_count * 2)
         neighbours = []
         for i in range(neighbours_count):
-            neighbours.append(Location(location.x + random_numbers[i], location.y + random_numbers[i + 1]))
+            neighbours.append(Location(location.x + random_numbers[i*2], location.y + random_numbers[i*2 + 1]))
         return neighbours
     return generate_neighbourhood
