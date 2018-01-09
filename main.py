@@ -46,11 +46,6 @@ def main():
                 return
             resources.append((Resource(location, transport_cost_func), required_units))
 
-    for resource in resources:
-        res = resource[0]
-        print("Location: {} {}       Func result for 5: {}"
-              .format(res.location.x, res.location.y, res.unit_transport_cost_function(5)))
-
     plot_logger = PlotLogger()
     algorithm = HillClimbingAlgorithm(create_evaluator(resources),
                                       create_gaussian_neighbourhood_generator(NEIGHBOURS_COUNT, 1),
