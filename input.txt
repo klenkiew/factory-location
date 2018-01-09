@@ -1,0 +1,7 @@
+# Resources:
+# x | y | required units | unit transport cost function
+1 2 2 def func(d): return d
+3 5 1 def func(d): return d*2 + 2
+-1 1 6 def func(d): return d**2
+59 0 14 def func(d): return d
+10 12 4 def func(d): import math; return math.sqrt(d)
