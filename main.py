@@ -1,5 +1,6 @@
 import sys
 
+from evolutionary_algorithm import *
 from hill_climbing_algorithm import *
 from logger import *
 from location import Location
@@ -46,12 +47,25 @@ def main():
                 return
             resources.append((Resource(location, transport_cost_func), required_units))
 
+    run_hill_climbing_algorithm(resources)
+    run_evolutionary_algorithm(resources)
+
+
+def run_evolutionary_algorithm(resources):
+    algorothm = EvolutionaryAlgorithm(create_tournament_selection(2), crossover, create_mutator(1),
+                                      create_replace_function(create_evaluator(resources)),
+                                      lambda iter, pop: iter == 100, 0.2)
+    result = algorothm.run([Location(0, 0) for _ in range(20)]).best_individual
+    print("[HillClimbing] Best location: ({}, {}) [{}]".format(result.value.x, result.value.y, result.fitness))
+
+
+def run_hill_climbing_algorithm(resources):
     plot_logger = PlotLogger()
     algorithm = HillClimbingAlgorithm(create_evaluator(resources),
                                       create_gaussian_neighbourhood_generator(NEIGHBOURS_COUNT, 1),
                                       AggregateLogger([StandardOutputLogger(), plot_logger]))
     result = algorithm.run(Location(0, 0))
-    print("Best location: ({}, {}) [{}]".format(result[0].x, result[0].y, result[1]))
+    print("[EvolutionaryAlgorithm] Best location: ({}, {}) [{}]".format(result[0].x, result[0].y, result[1]))
     plot_logger.draw()
 
 
