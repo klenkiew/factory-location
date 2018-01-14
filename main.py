@@ -7,6 +7,8 @@ from location import Location2D
 from resource import Resource
 from neighbourhood import create_gaussian_neighbour_gen
 from evaluator import create_evaluator
+from evolutionary_algorithm import EvolutionaryAlgorithmOptions, EvolutionaryAlgorithm
+from evolutionary_selection import ProportionalSelector, TournamentSelector, ThresholdSelector
 
 
 NEIGHBOURS_COUNT = 100
@@ -21,12 +23,52 @@ def is_number(value):
     else:
         return True
 
+def is_int(value):
+    """Returns true if value is integer or false othervise."""
+    try:
+        int(value)
+    except ValueError:
+        return False
+    else:
+        return True
+
 
 def main():
     """Factory location optimizer entry point."""
-    if len(sys.argv) != 2:
-        print "Please enter an input file name"
+    if len(sys.argv) != 3:
+        print "Please enter an input file name and select algorithm."
+        print "Available algorithms:"
+        print "0 - Hill climbing algorithm"
+        print "1 - Evolutionary algorithm"
         return
+
+    if not is_int(sys.argv[2]) or int(sys.argv[2]) > 1 or int(sys.argv[2]) < 0:
+        print "Second argument is not valid algorithm number!"
+        return
+
+    selected_algorithm = int(sys.argv[2])
+
+    start = input("Select start point (Location2D(x, y)): ")
+    if selected_algorithm != 1:
+        neighbours = input("Neighbourhood size: ")
+    neighbours_sigma = input("Neighbourhood sigma: ")
+    neighbours_mean = input("Neighbourhood mean: ")
+
+    if selected_algorithm == 1:
+        print "---Evolutionary algorithm parameters---"
+        print "Available selection methods:"
+        print "0 - proportional selection"
+        print "1 - tournament selection"
+        print "2 - threshold selection"
+        selector = input("Select selection method: ")
+        if selector == 1:
+            tournament_size = input("Select tournament size: ")
+        if selector == 2:
+            threshold = input("Select threshold: ")
+        pop_size = input("Select population size: ")
+        rep_size = input("Select reproduction size: ")
+        cross = input("Select crossover probability (0.0 - 1.0): ")
+        iterations_count = input("Select iterations count: ")
 
     resources = []
     with open(sys.argv[1], 'r') as input_file:
@@ -52,12 +94,27 @@ def main():
                 return
             resources.append((Resource(location, transport_cost_func), required_units))
 
+    evaluator = create_evaluator(resources)
     plot_logger = PlotLogger()
-    algorithm = HillClimbingAlgorithm(create_evaluator(resources),
-                                      create_gaussian_neighbour_gen(NEIGHBOURS_COUNT, 1),
-                                      AggregateLogger([StdOutputLogger("Hill climbing algorithm"),
-                                                       plot_logger]))
-    result = algorithm.run()
+
+    if selected_algorithm == 1:
+        if selector == 0:
+            selector_obj = ProportionalSelector()
+        if selector == 1:
+            selector_obj = TournamentSelector(evaluator, tournament_size)
+        if selector == 2:
+            selector_obj = ThresholdSelector(evaluator, threshold)
+
+    if selected_algorithm == 0:
+        algorithm = HillClimbingAlgorithm(evaluator,
+                                          create_gaussian_neighbour_gen(neighbours, neighbours_sigma, neighbours_mean),
+                                          AggregateLogger([StdOutputLogger("Hill climbing algorithm"), plot_logger]))
+    else:
+        options = EvolutionaryAlgorithmOptions(selector_obj, pop_size, rep_size, cross, iterations_count)
+        algorithm = EvolutionaryAlgorithm(evaluator, options,
+                                        create_gaussian_neighbour_gen(1, neighbours_sigma, neighbours_mean),
+                                        AggregateLogger([StdOutputLogger("Evolutionary algorithm"), plot_logger]))
+    result = algorithm.run(start)
     print "Best location: ({}, {}) [{}]".format(result[0].position_x,
                                                 result[0].position_y,
                                                 result[1])
