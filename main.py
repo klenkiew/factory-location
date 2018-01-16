@@ -33,42 +33,46 @@ def is_int(value):
         return True
 
 
+def input_with_eval(prompt):
+    return eval(input(prompt))
+
+
 def main():
     """Factory location optimizer entry point."""
     if len(sys.argv) != 3:
-        print "Please enter an input file name and select algorithm."
-        print "Available algorithms:"
-        print "0 - Hill climbing algorithm"
-        print "1 - Evolutionary algorithm"
+        print("Please enter an input file name and select algorithm.")
+        print("Available algorithms:")
+        print("0 - Hill climbing algorithm")
+        print("1 - Evolutionary algorithm")
         return
 
     if not is_int(sys.argv[2]) or int(sys.argv[2]) > 1 or int(sys.argv[2]) < 0:
-        print "Second argument is not valid algorithm number!"
+        print("Second argument is not valid algorithm number!")
         return
 
     selected_algorithm = int(sys.argv[2])
 
-    start = input("Select start point (Location2D(x, y)): ")
+    start = input_with_eval("Select start point (Location2D(x, y)): ")
     if selected_algorithm != 1:
-        neighbours = input("Neighbourhood size: ")
-    neighbours_sigma = input("Neighbourhood sigma: ")
-    neighbours_mean = input("Neighbourhood mean: ")
+        neighbours = input_with_eval("Neighbourhood size: ")
+    neighbours_sigma = input_with_eval("Neighbourhood sigma: ")
+    neighbours_mean = input_with_eval("Neighbourhood mean: ")
 
     if selected_algorithm == 1:
-        print "---Evolutionary algorithm parameters---"
-        print "Available selection methods:"
-        print "0 - proportional selection"
-        print "1 - tournament selection"
-        print "2 - threshold selection"
-        selector = input("Select selection method: ")
+        print("---Evolutionary algorithm parameters---")
+        print("Available selection methods:")
+        print("0 - proportional selection")
+        print("1 - tournament selection")
+        print("2 - threshold selection")
+        selector = int(input_with_eval("Select selection method: "))
         if selector == 1:
-            tournament_size = input("Select tournament size: ")
+            tournament_size = input_with_eval("Select tournament size: ")
         if selector == 2:
-            threshold = input("Select threshold: ")
-        pop_size = input("Select population size: ")
-        rep_size = input("Select reproduction size: ")
-        cross = input("Select crossover probability (0.0 - 1.0): ")
-        iterations_count = input("Select iterations count: ")
+            threshold = input_with_eval("Select threshold: ")
+        pop_size = input_with_eval("Select population size: ")
+        rep_size = input_with_eval("Select reproduction size: ")
+        cross = input_with_eval("Select crossover probability (0.0 - 1.0): ")
+        iterations_count = input_with_eval("Select iterations count: ")
 
     resources = []
     with open(sys.argv[1], 'r') as input_file:
@@ -90,7 +94,7 @@ def main():
             # check that the result type is correct (should be a number)
             result = transport_cost_func(0)
             if not is_number(result):
-                print "Wrong type of function result"
+                print("Wrong type of function result")
                 return
             resources.append((Resource(location, transport_cost_func), required_units))
 
@@ -115,9 +119,9 @@ def main():
                                         create_gaussian_neighbour_gen(1, neighbours_sigma, neighbours_mean),
                                         AggregateLogger([StdOutputLogger("Evolutionary algorithm"), plot_logger]))
     result = algorithm.run(start)
-    print "Best location: ({}, {}) [{}]".format(result[0].position_x,
+    print("Best location: ({}, {}) [{}]".format(result[0].position_x,
                                                 result[0].position_y,
-                                                result[1])
+                                                result[1]))
     # draw goal function plot
     plot_logger.draw("Goal function")
     # draw resources and factory location
