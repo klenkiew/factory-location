@@ -1,103 +1,65 @@
-import random
+"""Module with evolutionary algorithm class."""
+import numpy as np
+from algorithm import Algorithm, NullLogger, Location2D
 
-import numpy
+class EvolutionaryAlgorithmOptions(object):
+    """Evolutionary algorithm parameters."""
 
-from location import Location
+    def __init__(self, selector, population_size, reproduction_size, crossover_prob, iterations):
+        self.population_size = population_size
+        self.reproduction_size = reproduction_size
+        self.selector = selector
+        self.crossover_probability = crossover_prob
+        self.iterations = iterations
 
+class EvolutionaryAlgorithm(Algorithm):
+    """Evolutionary algorithm implementation."""
 
-class EvolutionaryAlgorithm:
-    def __init__(self, selection, crossover, mutation, replacement, stop_condition, crossover_rate):
-        self.mutate = mutation
-        self.crossover = crossover
-        self.select = selection
-        self.replace = replacement
-        self.should_stop = stop_condition
-        self.crossover_rate = crossover_rate
+    def __init__(self, evaluator, options, neighbourhood_gen, logger=NullLogger()):
+        Algorithm.__init__(self, evaluator, neighbourhood_gen, logger)
+        self.options = options
 
-    def run(self, initial_population):
-        current_population = self.replace(None, initial_population)
-        iteration_count = 1
-        while not self.should_stop(iteration_count, current_population):
-            new_population = []
-            for i in range(len(initial_population)):
-                if random.random() < self.crossover_rate:
-                    first_parent = self.select(current_population)
-                    second_parent = self.select(current_population)
-                    individual = self.mutate(self.crossover(first_parent, second_parent))
+    def mutation(self, subject):
+        """Creates subjects mutant."""
+        return self.neighbourhood_generator(subject)[0]
+
+    def crossover(self, first, second):
+        """Creates subjects crossover."""
+        return Location2D(second.position_y, first.position_x)
+
+    def run(self, start_point=Location2D()):
+        # initialize population with neighbours of start_point
+        population = []
+        for i in range(self.options.population_size):
+            population.append(self.mutation(start_point))
+            if i == 0:
+                best = population[i]
+                best_score = self.evaluator(best)
+            else:
+                subject_score = self.evaluator(population[i])
+                if subject_score < best_score:
+                    best_score = subject_score
+                    best = population[i]
+        iteration = 1
+        # sort population according to goal function
+        population = sorted(population, lambda x, y: int(np.sign(self.evaluator(x) - self.evaluator(y))))
+        while iteration <= self.options.iterations:
+            self.logger.next_iteration(iteration, best, best_score)
+            reproduced = []
+            for i in range(self.options.reproduction_size):
+                if np.random.uniform() < self.options.crossover_probability:
+                    to_cross = self.options.selector.select(population, 2)
+                    reproduced.append(self.mutation(self.crossover(to_cross[0], to_cross[1])))
                 else:
-                    individual = self.mutate(self.select(current_population))
-                new_population.append(individual)
-            current_population = self.replace(current_population, new_population)
-            iteration_count += 1
-        return current_population
+                    reproduced.append(self.mutation(self.options.selector.select(population, 1)[0]))
+            # TODO: Maybe elite replacement too (it's only generational now)
+            for j in range(self.options.population_size):
+                population[j] = reproduced[j]
+                subject_score = self.evaluator(population[j])
+                if subject_score < best_score:
+                    best_score = subject_score
+                    best = population[j]
+            population = sorted(population, lambda x, y: int(np.sign(self.evaluator(x) - self.evaluator(y))))
+            iteration += 1
+        return best, best_score
 
-
-class Individual:
-    def __init__(self, location, fitness):
-        self.value = location
-        self.fitness = fitness
-
-
-class Population:
-    def __init__(self, individuals, best_individual, total_fitness):
-        self.individuals = individuals
-        self.best_individual = best_individual
-        self.total_fitness = total_fitness
-
-
-def create_tournament_selection(tournament_size):
-    def tournament_selection(population):
-        tournament_participants = list(map(lambda _: random.choice(population.individuals), range(tournament_size)))
-        # we minimize fitness
-        return min(tournament_participants, key=lambda ind: ind.fitness).value
-    return tournament_selection
-
-
-# TODO works for maximization, we need to minimize fitness
-# (which is total cost # of transporting all resources to the factory)
-# proportionate selection
-def select(population):
-    rand = random.uniform(0.0, population.total_fitness)
-    for individual in population.individuals:
-        rand -= individual.fitness
-        if rand < 0:
-            return individual.value
-    # should only happen if rounding errors occur, the last population individual is returned
-    return population.individuals[-1].value
-
-
-# intermediate recombination
-def crossover(first_location, second_location):
-    alfa_x = random.random()
-    alfa_y = random.random()
-    new_x = alfa_x * first_location.x + (1 - alfa_x) * second_location.x
-    new_y = alfa_y * first_location.y + (1 - alfa_y) * second_location.y
-    return Location(new_x, new_y)
-
-
-# gaussian mutation
-def create_mutator(sigma, mean=0.0):
-    def mutate(location):
-        random_numbers = numpy.random.normal(mean, sigma, 2)
-        return Location(location.x + random_numbers[0], location.y + random_numbers[1])
-    return mutate
-
-
-def create_replace_function(fitness_evaluator):
-    def replace_population(old_population, new_locations):
-        new_population = []
-        best_individual = old_population.best_individual if old_population else Individual(None, float('inf'))
-        total_fitness = 0.0
-        for location in new_locations:
-            # new population individuals are not evaluated yet, so we do it here
-            fitness = fitness_evaluator(location)
-            individual = Individual(location, fitness)
-            total_fitness += individual.fitness
-            # fitness is a cost function in our case, so we minimize it
-            if individual.fitness < best_individual.fitness:
-                best_individual = individual
-            new_population.append(individual)
-        # population must be sorted for roulette wheel selection to work properly
-        new_population.sort(key=lambda ind: ind.fitness)
-        return Population(new_population, best_individual, total_fitness)
-    return replace_population
