@@ -1,0 +1,14 @@
+{
+    "Algorithm": 0,
+    "Neighbourhood_size": 100,
+    "Neighbourhood_sigma": 1.0,
+    "Neighbourhood_mean": 0.0,
+    "Selection_method": 1,
+    "Tournament_size": 10,
+    "Selection_threshold": 2,
+    "Population_size": 100,
+    "Reproduction_size": 100,
+    "Crossover_probability": 0.5,
+    "Iterations_count": 1000,
+    "Start_point": [0.0, 0.0]
+}

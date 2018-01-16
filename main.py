@@ -1,124 +1,118 @@
 """Module with entry point for factory localization optimizer."""
 import sys
+import json
 
 from hill_climbing_algorithm import HillClimbingAlgorithm
 from logger import AggregateLogger, StdOutputLogger, PlotLogger, plt
 from location import Location2D
-from resource import Resource
+from resource import Resource, ResourceRequirement
 from neighbourhood import create_gaussian_neighbour_gen
 from evaluator import create_evaluator
 from evolutionary_algorithm import EvolutionaryAlgorithmOptions, EvolutionaryAlgorithm
 from evolutionary_selection import ProportionalSelector, TournamentSelector, ThresholdSelector
+from utils import interactive_mode
 
 
 NEIGHBOURS_COUNT = 100
 
 
-def is_number(value):
-    """Returns true if value is a real number or false otherwise."""
-    try:
-        float(value)
-    except ValueError:
-        return False
-    else:
-        return True
-
-def is_int(value):
-    """Returns true if value is integer or false othervise."""
-    try:
-        int(value)
-    except ValueError:
-        return False
-    else:
-        return True
-
-
-def input_with_eval(prompt):
-    return eval(input(prompt))
-
-
 def main():
     """Factory location optimizer entry point."""
-    if len(sys.argv) != 3:
-        print("Please enter an input file name and select algorithm.")
-        print("Available algorithms:")
-        print("0 - Hill climbing algorithm")
-        print("1 - Evolutionary algorithm")
-        return
 
-    if not is_int(sys.argv[2]) or int(sys.argv[2]) > 1 or int(sys.argv[2]) < 0:
-        print("Second argument is not valid algorithm number!")
-        return
+    # default run parameters
+    params = dict()
+    params["Input_file"] = "Input.json"
+    params["Algorithm_config_file"] = False
+    params["Algorithm"] = 0
+    params["Start_point"] = [0, 0]
+    params["Neighbourhood_size"] = 100
+    params["Neighbourhood_sigma"] = 1.0
+    params["Neighbourhood_mean"] = 0.0
+    params["Resources"] = []
 
-    selected_algorithm = int(sys.argv[2])
-
-    start = input_with_eval("Select start point (Location2D(x, y)): ")
-    if selected_algorithm != 1:
-        neighbours = input_with_eval("Neighbourhood size: ")
-    neighbours_sigma = input_with_eval("Neighbourhood sigma: ")
-    neighbours_mean = input_with_eval("Neighbourhood mean: ")
-
-    if selected_algorithm == 1:
-        print("---Evolutionary algorithm parameters---")
-        print("Available selection methods:")
-        print("0 - proportional selection")
-        print("1 - tournament selection")
-        print("2 - threshold selection")
-        selector = int(input_with_eval("Select selection method: "))
-        if selector == 1:
-            tournament_size = input_with_eval("Select tournament size: ")
-        if selector == 2:
-            threshold = input_with_eval("Select threshold: ")
-        pop_size = input_with_eval("Select population size: ")
-        rep_size = input_with_eval("Select reproduction size: ")
-        cross = input_with_eval("Select crossover probability (0.0 - 1.0): ")
-        iterations_count = input_with_eval("Select iterations count: ")
-
-    resources = []
-    with open(sys.argv[1], 'r') as input_file:
-        lines = input_file.readlines()
-        non_comment_lines = [l for l in lines if l[0] != "#"]
-        for line in non_comment_lines:
-            # file format: resource x coord, resource y coord,
-            # required units, transport cost function separated
-            # with spaces
-            split = line.split(" ", 3)
-            location = Location2D(float(split[0]), float(split[1]))
-            required_units = float(split[2])
-            func_dict = {}
-            # create a function from string
-            # TODO: it can't handle multi-line functions
-            exec(split[3], func_dict)
-            # extract the function
-            transport_cost_func = func_dict["func"]
-            # check that the result type is correct (should be a number)
-            result = transport_cost_func(0)
-            if not is_number(result):
-                print("Wrong type of function result")
+    # check given options
+    skip = False
+    for i in range(1, len(sys.argv)):
+        if skip:
+            skip = False
+            continue
+        if sys.argv[i] == "-i" or sys.argv[i] == "--input":
+            if len(sys.argv) <= i + 1:
+                print("Not enough arguments!")
                 return
-            resources.append((Resource(location, transport_cost_func), required_units))
+            params["Input_file"] = sys.argv[i + 1]
+            skip = True
+            continue
+        if sys.argv[i] == "-ac" or sys.argv[i] == "--algorithm_config":
+            if len(sys.argv) <= i + 1:
+                print("Not enough arguments!")
+                return
+            params["Algorithm_config_file"] = sys.argv[i + 1]
+            skip = True
+            continue
+        if sys.argv[i] == "-h" or sys.argv[i] == "--help":
+            print("Factory location optimizer.")
+            print("Available options:")
+            print("-i  --input\t\t[FileName]\tSets file with factory resources.")
+            print("-ac --algorithm_config\t[FileName]\tSets file with algorithm options.")
+            print("-h  --help\t\t\t\tShows help and close program.")
+            print("Available algorithms:")
+            print("0 - Hill climbing algorithm")
+            print("1 - Evolutionary algorithm")
+            print("Available selection methods (for evolutionary algorithm only):")
+            print("0 - proportional selection")
+            print("1 - tournament selection")
+            print("2 - threshold selection")
+            return
+        print("Not recognized argument! Skipping...")
 
-    evaluator = create_evaluator(resources)
+    # run interactive mode
+    if params["Algorithm_config_file"] is False:
+        interactive_mode(params, params["Input_file"] == "Input.json")
+    else:
+        print("Loading algorithm configuration from file: " + params["Algorithm_config_file"])
+        try:
+            algorithm_config = json.load(open(params["Algorithm_config_file"], 'r'))
+            for key in algorithm_config.keys():
+                params[key] = algorithm_config[key]
+        except FileNotFoundError:
+            print("Cannot open " + params["Algorithm_config_file"] + " file!")
+            return
+
+    print("Loading resources from: " + params["Input_file"])
+    try:
+        resources_json = json.load(open(params["Input_file"], 'r'))
+        for res in resources_json["Resources"]:
+            func_dict = dict()
+            exec(res["Transport_cost_func"], func_dict)
+            params["Resources"].append(ResourceRequirement(Resource(Location2D(res["Position"][0], res["Position"][1]), func_dict["f"]), res["Required_units"]))
+    except FileNotFoundError:
+        print("Cannot open " + params["Input_file"] + " file!")
+        return
+    print("Loaded " + str(len(params["Resources"])) + " resources!")
+
+    evaluator = create_evaluator(params["Resources"])
     plot_logger = PlotLogger()
 
-    if selected_algorithm == 1:
-        if selector == 0:
+    if params["Algorithm"] == 1:
+        if params["Selection_method"] == 0:
             selector_obj = ProportionalSelector()
-        if selector == 1:
-            selector_obj = TournamentSelector(evaluator, tournament_size)
-        if selector == 2:
-            selector_obj = ThresholdSelector(evaluator, threshold)
+        if params["Selection_method"] == 1:
+            selector_obj = TournamentSelector(evaluator, params["Tournament_size"])
+        if params["Selection_method"] == 2:
+            selector_obj = ThresholdSelector(evaluator, params["Selection_threshold"])
 
-    if selected_algorithm == 0:
+    if params["Algorithm"] == 0:
         algorithm = HillClimbingAlgorithm(evaluator,
-                                          create_gaussian_neighbour_gen(neighbours, neighbours_sigma, neighbours_mean),
+                                          create_gaussian_neighbour_gen(params["Neighbourhood_size"], params["Neighbourhood_sigma"], params["Neighbourhood_mean"]),
                                           AggregateLogger([StdOutputLogger("Hill climbing algorithm"), plot_logger]))
     else:
-        options = EvolutionaryAlgorithmOptions(selector_obj, pop_size, rep_size, cross, iterations_count)
+        options = EvolutionaryAlgorithmOptions(selector_obj, params["Population_size"], params["Reproduction_size"],
+                                               params["Crossover_probability"], params["Iterations_count"])
         algorithm = EvolutionaryAlgorithm(evaluator, options,
-                                        create_gaussian_neighbour_gen(1, neighbours_sigma, neighbours_mean),
+                                        create_gaussian_neighbour_gen(1, params["Neighbourhood_sigma"], params["Neighbourhood_mean"]),
                                         AggregateLogger([StdOutputLogger("Evolutionary algorithm"), plot_logger]))
-    result = algorithm.run(start)
+    result = algorithm.run(Location2D(params["Start_point"][0], params["Start_point"][1]))
     print("Best location: ({}, {}) [{}]".format(result[0].position_x,
                                                 result[0].position_y,
                                                 result[1]))
@@ -126,8 +120,8 @@ def main():
     plot_logger.draw("Goal function")
     # draw resources and factory location
     # resources as green dots and factory as red dot
-    for res in resources:
-        plt.plot(res[0].location.position_x, res[0].location.position_y, "go")
+    for res in params["Resources"]:
+        plt.plot(res.resource.location.position_x, res.resource.location.position_y, "go")
     plt.plot(result[0].position_x, result[0].position_y, "ro")
     plt.xlabel("Position X")
     plt.ylabel("Position Y")

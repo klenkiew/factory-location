@@ -48,7 +48,7 @@ class EvolutionaryAlgorithm(Algorithm):
                     best = population[i]
         iteration = 1
         # sort population according to goal function
-        population = sorted(population, key=lambda ind: self.evaluator(ind))
+        population = sorted(population, key=self.evaluator)
         while iteration <= self.options.iterations:
             self.logger.next_iteration(iteration, best, best_score)
             reproduced = []
@@ -65,7 +65,7 @@ class EvolutionaryAlgorithm(Algorithm):
                 if subject_score < best_score:
                     best_score = subject_score
                     best = population[j]
-            population = sorted(population, key=lambda ind: self.evaluator(ind))
+            population = sorted(population, key=self.evaluator)
             iteration += 1
         return best, best_score
 

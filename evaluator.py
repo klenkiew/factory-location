@@ -5,6 +5,6 @@ def create_evaluator(required_resources):
 
     def evaluate(factory_location):
         """Evaluates goal function for specified factory location."""
-        return sum([required_units * resource.unit_transport_cost_function(factory_location.distance(resource.location))
-                    for resource, required_units in required_resources])
+        return sum([resource.required_units * resource.resource.unit_transport_cost_function(factory_location.distance(resource.resource.location))
+                    for resource in required_resources])
     return evaluate

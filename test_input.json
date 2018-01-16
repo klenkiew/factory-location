@@ -1,0 +1,29 @@
+{
+    "Resources": [
+        {
+            "Position": [1.0, 2.0],
+            "Required_units": 2,
+            "Transport_cost_func": "def f(d): return d"
+        },
+        {
+            "Position": [3.0, 5.0],
+            "Required_units": 1,
+            "Transport_cost_func": "def f(d): return d * 2 + 2"
+        },
+        {
+            "Position": [-1.0, 1.0],
+            "Required_units": 6,
+            "Transport_cost_func": "def f(d): return d ** 2"
+        },
+        {
+            "Position": [59.0, 0.0],
+            "Required_units": 14,
+            "Transport_cost_func": "def f(d): return d"
+        },
+        {
+            "Position": [10.0, 12.0],
+            "Required_units": 4,
+            "Transport_cost_func": "def f(d): import math; return math.sqrt(d)"
+        }
+    ]
+}
