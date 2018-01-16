@@ -1,4 +1,6 @@
 """Module with evolutionary algorithm class."""
+import random
+
 import numpy as np
 from algorithm import Algorithm, NullLogger, Location2D
 
@@ -25,7 +27,11 @@ class EvolutionaryAlgorithm(Algorithm):
 
     def crossover(self, first, second):
         """Creates subjects crossover."""
-        return Location2D(second.position_y, first.position_x)
+        alfa_x = random.random()
+        alfa_y = random.random()
+        new_x = alfa_x * first.position_x + (1 - alfa_x) * second.position_x
+        new_y = alfa_y * first.position_y + (1 - alfa_y) * second.position_y
+        return Location2D(new_x, new_y)
 
     def run(self, start_point=Location2D()):
         # initialize population with neighbours of start_point
