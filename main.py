@@ -74,7 +74,12 @@ def main():
         try:
             algorithm_config = json.load(open(params["Algorithm_config_file"], 'r'))
             for key in algorithm_config.keys():
-                params[key] = algorithm_config[key]
+                if key == "Stop_condition":
+                    func_dict = dict()
+                    exec(algorithm_config[key], func_dict)
+                    params[key] = func_dict["cond"]
+                else:
+                    params[key] = algorithm_config[key]
         except FileNotFoundError:
             print("Cannot open " + params["Algorithm_config_file"] + " file!")
             return
@@ -108,7 +113,7 @@ def main():
                                           AggregateLogger([StdOutputLogger("Hill climbing algorithm"), plot_logger]))
     else:
         options = EvolutionaryAlgorithmOptions(selector_obj, params["Population_size"], params["Reproduction_size"],
-                                               params["Crossover_probability"], params["Iterations_count"])
+                                               params["Crossover_probability"], params["Stop_condition"])
         algorithm = EvolutionaryAlgorithm(evaluator, options,
                                         create_gaussian_neighbour_gen(1, params["Neighbourhood_sigma"], params["Neighbourhood_mean"]),
                                         AggregateLogger([StdOutputLogger("Evolutionary algorithm"), plot_logger]))
