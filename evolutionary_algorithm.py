@@ -7,18 +7,17 @@ from algorithm import Algorithm, NullLogger, Location2D
 class EvolutionaryAlgorithmOptions(object):
     """Evolutionary algorithm parameters."""
 
-    def __init__(self, selector, population_size, reproduction_size, crossover_prob, stop_cond):
+    def __init__(self, selector, population_size, reproduction_size, crossover_prob):
         self.population_size = population_size
         self.reproduction_size = reproduction_size
         self.selector = selector
         self.crossover_probability = crossover_prob
-        self.should_stop = stop_cond
 
 class EvolutionaryAlgorithm(Algorithm):
     """Evolutionary algorithm implementation."""
 
-    def __init__(self, evaluator, options, neighbourhood_gen, logger=NullLogger()):
-        Algorithm.__init__(self, evaluator, neighbourhood_gen, logger)
+    def __init__(self, evaluator, options, neighbourhood_gen, stop_cond, logger=NullLogger()):
+        Algorithm.__init__(self, evaluator, neighbourhood_gen, stop_cond, logger)
         self.options = options
 
     def mutation(self, subject):
@@ -53,7 +52,7 @@ class EvolutionaryAlgorithm(Algorithm):
         # sort population according to goal function
         population.sort(key=lambda x: x[1])
 
-        while not self.options.should_stop(iteration, population, self.evaluator.evaluations):
+        while not self.should_stop(iteration, population, self.evaluator.evaluations):
             self.logger.next_iteration(iteration, best, best_score)
             reproduced = []
             for i in range(self.options.reproduction_size):

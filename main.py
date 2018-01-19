@@ -110,13 +110,13 @@ def main():
     if params["Algorithm"] == 0:
         algorithm = HillClimbingAlgorithm(evaluator,
                                           create_gaussian_neighbour_gen(params["Neighbourhood_size"], params["Neighbourhood_sigma"], params["Neighbourhood_mean"]),
-                                          AggregateLogger([StdOutputLogger("Hill climbing algorithm"), plot_logger]))
+                                          params["Stop_condition"], AggregateLogger([StdOutputLogger("Hill climbing algorithm"), plot_logger]))
     else:
         options = EvolutionaryAlgorithmOptions(selector_obj, params["Population_size"], params["Reproduction_size"],
-                                               params["Crossover_probability"], params["Stop_condition"])
+                                               params["Crossover_probability"])
         algorithm = EvolutionaryAlgorithm(evaluator, options,
                                         create_gaussian_neighbour_gen(1, params["Neighbourhood_sigma"], params["Neighbourhood_mean"]),
-                                        AggregateLogger([StdOutputLogger("Evolutionary algorithm"), plot_logger]))
+                                        params["Stop_condition"], AggregateLogger([StdOutputLogger("Evolutionary algorithm"), plot_logger]))
     result = algorithm.run(Location2D(params["Start_point"][0], params["Start_point"][1]))
     print("Best location: ({}, {}) [{}]".format(result[0].position_x,
                                                 result[0].position_y,
