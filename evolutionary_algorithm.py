@@ -34,11 +34,13 @@ class EvolutionaryAlgorithm(Algorithm):
         return Location2D(new_x, new_y)
 
     def run(self, start_point=Location2D()):
+        iteration = 1
+
         # initialize population with neighbours of start_point
         population = []
         for i in range(self.options.population_size):
             new_subject = self.mutation(start_point)
-            new_score = self.evaluator(new_subject)
+            new_score = self.evaluate(new_subject)
             population.append([new_subject, new_score])
             if i == 0:
                 best = new_subject
@@ -47,21 +49,21 @@ class EvolutionaryAlgorithm(Algorithm):
                 if new_score < best_score:
                     best_score = new_score
                     best = new_subject
-        iteration = 1
+
         # sort population according to goal function
         population.sort(key=lambda x: x[1])
-        while not self.options.should_stop(iteration, population):
+        while not self.options.should_stop(iteration, population, self.evaluator.evaluations):
             self.logger.next_iteration(iteration, best, best_score)
             reproduced = []
             for i in range(self.options.reproduction_size):
                 if np.random.uniform() < self.options.crossover_probability:
                     to_cross = self.options.selector.select(population, 2)
                     new_subject = self.mutation(self.crossover(to_cross[0], to_cross[1]))
-                    new_score = self.evaluator(new_subject)
+                    new_score = self.evaluate(new_subject)
                     reproduced.append([new_subject, new_score])
                 else:
                     new_subject = self.mutation(self.options.selector.select(population, 1)[0][0])
-                    new_score = self.evaluator(new_subject)
+                    new_score = self.evaluate(new_subject)
                     reproduced.append([new_subject, new_score])
             # elitary replacement population[-1] = best in old population
             population[0] = population[-1]

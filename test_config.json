@@ -9,6 +9,6 @@
     "Population_size": 100,
     "Reproduction_size": 99,
     "Crossover_probability": 0.7,
-    "Stop_condition": "def cond(iteration, population): return iteration > 500",
+    "Stop_condition": "def cond(iteration, population, evaluations): return iteration > 500",
     "Start_point": [0.0, 0.0]
 }

@@ -10,6 +10,10 @@ class Algorithm(object):
         self.neighbourhood_generator = neighbourhood_gen
         self.logger = logger
 
+    def evaluate(self, location):
+        """Helper function evaluating goal function for given point."""
+        return self.evaluator.evaluate(location)
+
     def run(self, start_point=Location2D()):
         """Runs optimization algorithm starting from given point."""
         pass

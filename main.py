@@ -7,7 +7,7 @@ from logger import AggregateLogger, StdOutputLogger, PlotLogger, plt
 from location import Location2D
 from resource import Resource, ResourceRequirement
 from neighbourhood import create_gaussian_neighbour_gen
-from evaluator import create_evaluator
+from evaluator import Evaluator
 from evolutionary_algorithm import EvolutionaryAlgorithmOptions, EvolutionaryAlgorithm
 from evolutionary_selection import ProportionalSelector, TournamentSelector, ThresholdSelector
 from utils import interactive_mode
@@ -96,7 +96,7 @@ def main():
         return
     print("Loaded " + str(len(params["Resources"])) + " resources!")
 
-    evaluator = create_evaluator(params["Resources"])
+    evaluator = Evaluator(params["Resources"])
     plot_logger = PlotLogger()
 
     if params["Algorithm"] == 1:
@@ -121,6 +121,7 @@ def main():
     print("Best location: ({}, {}) [{}]".format(result[0].position_x,
                                                 result[0].position_y,
                                                 result[1]))
+    print("Evaluations count: {}".format(evaluator.evaluations))
     # draw goal function plot
     plot_logger.draw("Goal function")
     # draw resources and factory location
