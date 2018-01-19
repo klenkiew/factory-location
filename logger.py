@@ -12,6 +12,10 @@ class NullLogger(object):
         "Method called to output itaration data with generated neighbour data."
         pass
 
+    def clear(self):
+        """Clears logger log if any."""
+        pass
+
 class StdOutputLogger(NullLogger):
     """Logger outputting information to standard output."""
 
@@ -41,6 +45,9 @@ class PlotLogger(NullLogger):
     def next_neighbour(self, iteration_count, neighbour, current_node_score, best, best_score):
         pass
 
+    def clear(self):
+        self.results = []
+
     def draw(self, plot_name="Created plot"):
         """Draws plot created from logged data."""
         plt.plot([result[0] for result in self.results], [result[1] for result in self.results],
@@ -64,3 +71,7 @@ class AggregateLogger(NullLogger):
     def next_neighbour(self, iteration_count, neighbour, current_node_score, best, best_score):
         for logger in self.loggers:
             logger.next_neighbour(iteration_count, neighbour, current_node_score, best, best_score)
+
+    def clear(self):
+        for log in self.loggers:
+            log.clear()

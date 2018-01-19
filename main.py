@@ -3,7 +3,7 @@ import sys
 import json
 
 from hill_climbing_algorithm import HillClimbingAlgorithm
-from logger import AggregateLogger, StdOutputLogger, PlotLogger, plt
+from logger import AggregateLogger, StdOutputLogger, NullLogger, PlotLogger, plt
 from location import Location2D
 from resource import Resource, ResourceRequirement
 from neighbourhood import create_gaussian_neighbour_gen
@@ -12,16 +12,14 @@ from evolutionary_algorithm import EvolutionaryAlgorithmOptions, EvolutionaryAlg
 from evolutionary_selection import ProportionalSelector, TournamentSelector, ThresholdSelector
 from utils import interactive_mode
 
-
-NEIGHBOURS_COUNT = 100
-
-
 def main():
     """Factory location optimizer entry point."""
 
     # default run parameters
     params = dict()
     params["Input_file"] = "Input.json"
+    params["Tests_count"] = 20
+    params["Enable_log"] = False
     params["Algorithm_config_file"] = False
     params["Algorithm"] = 0
     params["Start_point"] = [0, 0]
@@ -108,31 +106,52 @@ def main():
             selector_obj = ThresholdSelector(params["Selection_threshold"])
 
     if params["Algorithm"] == 0:
+        algorith_name = "Hill climbing algorithm"
+    else:
+        algorith_name = "Evolutionary algorithm"
+
+    if params["Enable_log"]:
+        logger = AggregateLogger([StdOutputLogger(algorith_name), plot_logger])
+    else:
+        logger = NullLogger()
+
+    if params["Algorithm"] == 0:
         algorithm = HillClimbingAlgorithm(evaluator,
                                           create_gaussian_neighbour_gen(params["Neighbourhood_size"], params["Neighbourhood_sigma"], params["Neighbourhood_mean"]),
-                                          params["Stop_condition"], AggregateLogger([StdOutputLogger("Hill climbing algorithm"), plot_logger]))
+                                          params["Stop_condition"], logger)
     else:
         options = EvolutionaryAlgorithmOptions(selector_obj, params["Population_size"], params["Reproduction_size"],
                                                params["Crossover_probability"])
         algorithm = EvolutionaryAlgorithm(evaluator, options,
                                         create_gaussian_neighbour_gen(1, params["Neighbourhood_sigma"], params["Neighbourhood_mean"]),
-                                        params["Stop_condition"], AggregateLogger([StdOutputLogger("Evolutionary algorithm"), plot_logger]))
-    result = algorithm.run(Location2D(params["Start_point"][0], params["Start_point"][1]))
-    print("Best location: ({}, {}) [{}]".format(result[0].position_x,
-                                                result[0].position_y,
-                                                result[1]))
-    print("Evaluations count: {}".format(evaluator.evaluations))
-    # draw goal function plot
-    plot_logger.draw("Goal function")
-    # draw resources and factory location
-    # resources as green dots and factory as red dot
-    for res in params["Resources"]:
-        plt.plot(res.resource.location.position_x, res.resource.location.position_y, "go")
-    plt.plot(result[0].position_x, result[0].position_y, "ro")
-    plt.xlabel("Position X")
-    plt.ylabel("Position Y")
-    plt.title("Resources and factory location")
-    plt.show()
+                                        params["Stop_condition"], logger)
+
+    results = []
+    average_goal_func = 0.0
+    for i in range(params["Tests_count"]):
+        logger.clear()
+        results.append(algorithm.run(Location2D(params["Start_point"][0], params["Start_point"][1])))
+        average_goal_func += results[i][1]
+        if params["Enable_log"]:
+            print("Best location: ({}, {}) [{}]".format(results[i][0].position_x,
+                                                        results[i][0].position_y,
+                                                        results[i][1]))
+            print("Evaluations count: {}".format(evaluator.evaluations))
+            # draw goal function plot
+            plot_logger.draw("Goal function")
+            # draw resources and factory location
+            # resources as green dots and factory as red dot
+            for res in params["Resources"]:
+                plt.plot(res.resource.location.position_x, res.resource.location.position_y, "go")
+            plt.plot(results[i][0].position_x, results[i][0].position_y, "ro")
+            plt.xlabel("Position X")
+            plt.ylabel("Position Y")
+            plt.title("Resources and factory location")
+            plt.show()
+
+
+    average_goal_func /= params["Tests_count"]
+    print("Average goal function: {0:.4f}".format(average_goal_func))
 
 
 if __name__ == '__main__':
