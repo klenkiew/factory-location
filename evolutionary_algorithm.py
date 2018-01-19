@@ -52,7 +52,7 @@ class EvolutionaryAlgorithm(Algorithm):
         # sort population according to goal function
         population.sort(key=lambda x: x[1])
 
-        while not self.should_stop(iteration, population, self.evaluator.evaluations):
+        while not self.should_stop(iteration, [best, best_score], population, self.evaluator.evaluations):
             self.logger.next_iteration(iteration, best, best_score)
             reproduced = []
             for i in range(self.options.reproduction_size):
