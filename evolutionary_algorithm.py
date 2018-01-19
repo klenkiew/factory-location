@@ -67,8 +67,8 @@ class EvolutionaryAlgorithm(Algorithm):
                     reproduced.append([new_subject, new_score])
             # elitary replacement population[-1] = best in old population
             population[0] = population[-1]
-            for j in range(1, self.options.population_size - 1):
-                population[j] = reproduced[j]
+            for j in range(1, self.options.population_size):
+                population[j] = reproduced[j - 1]
                 if population[j][1] < best_score:
                     best_score = population[j][1]
                     best = population[j][0]
