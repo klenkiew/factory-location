@@ -52,6 +52,7 @@ class EvolutionaryAlgorithm(Algorithm):
 
         # sort population according to goal function
         population.sort(key=lambda x: x[1])
+
         while not self.options.should_stop(iteration, population, self.evaluator.evaluations):
             self.logger.next_iteration(iteration, best, best_score)
             reproduced = []
@@ -65,8 +66,7 @@ class EvolutionaryAlgorithm(Algorithm):
                     new_subject = self.mutation(self.options.selector.select(population, 1)[0][0])
                     new_score = self.evaluate(new_subject)
                     reproduced.append([new_subject, new_score])
-            # elitary replacement population[-1] = best in old population
-            population[0] = population[-1]
+            # elitary replacement population[0] = best in old population
             for j in range(1, self.options.population_size):
                 population[j] = reproduced[j - 1]
                 if population[j][1] < best_score:
