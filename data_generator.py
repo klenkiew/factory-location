@@ -1,6 +1,5 @@
 """Module with random resource generator."""
 import argparse
-import inspect
 import random
 import json
 
@@ -16,6 +15,7 @@ def main():
     parser.add_argument('max_req_units', type=float, help="Maximum value for required units")
     parser.add_argument('min_resources', type=int, help="Minimum number of resources")
     parser.add_argument('max_resources', type=int, help="Maximum number of resources")
+    parser.add_argument('output_filename', type=str, help="File name for output file with resources.")
     args = parser.parse_args()
     resources = generate_random_resources(args)
 
@@ -39,8 +39,7 @@ def main():
         json_main_obj["Resources"].append(json_res)
 
     # save to file
-    # TODO: not const filename
-    json.dump(json_main_obj, open("Out.json", 'w'), indent=4)
+    json.dump(json_main_obj, open(args.output_filename, 'w'), indent=4)
 
 
 def generate_random_resources(args):
@@ -78,6 +77,7 @@ def get_random_function_string():
 
 # power has to be an integer number
 def create_polynomial_function_string(power):
+    """Creates polynomial function string."""
     coefficients_string = "    coefficients = [" + str.join(', ', [str(random.randint(0, 10)) for _ in range(power)]) + "]\n"
     return "def f(x):\n" + coefficients_string + "    return sum([coefficients[i]*(x**(i/3.0)) for i in range({})])".format(power)
 
