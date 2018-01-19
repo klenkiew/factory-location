@@ -128,6 +128,7 @@ def main():
 
     results = []
     average_goal_func = 0.0
+    print("Running tests...")
     for i in range(params["Tests_count"]):
         logger.clear()
         results.append(algorithm.run(Location2D(params["Start_point"][0], params["Start_point"][1])))
