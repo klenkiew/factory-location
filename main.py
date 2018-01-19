@@ -103,9 +103,9 @@ def main():
         if params["Selection_method"] == 0:
             selector_obj = ProportionalSelector()
         if params["Selection_method"] == 1:
-            selector_obj = TournamentSelector(evaluator, params["Tournament_size"])
+            selector_obj = TournamentSelector(params["Tournament_size"])
         if params["Selection_method"] == 2:
-            selector_obj = ThresholdSelector(evaluator, params["Selection_threshold"])
+            selector_obj = ThresholdSelector(params["Selection_threshold"])
 
     if params["Algorithm"] == 0:
         algorithm = HillClimbingAlgorithm(evaluator,

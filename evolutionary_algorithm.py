@@ -49,7 +49,7 @@ class EvolutionaryAlgorithm(Algorithm):
                     best = new_subject
         iteration = 1
         # sort population according to goal function
-        population = sorted(population, key=lambda x: x[1])
+        population.sort(key=lambda x: x[1])
         while not self.options.should_stop(iteration, population):
             self.logger.next_iteration(iteration, best, best_score)
             reproduced = []
@@ -70,7 +70,7 @@ class EvolutionaryAlgorithm(Algorithm):
                 if population[j][1] < best_score:
                     best_score = population[j][1]
                     best = population[j][0]
-            population = sorted(population, key=lambda x: x[1])
+            population.sort(key=lambda x: x[1])
             iteration += 1
         return best, best_score
 

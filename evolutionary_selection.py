@@ -21,8 +21,7 @@ class ProportionalSelector(Selector):
 class TournamentSelector(Selector):
     """Tournament selector implementation."""
 
-    def __init__(self, evaluator, tournament_slots=2):
-        self.evaluate = evaluator
+    def __init__(self, tournament_slots=2):
         self.tournament_slots = tournament_slots
 
     def select(self, population, count):
@@ -30,10 +29,10 @@ class TournamentSelector(Selector):
         selected = []
         for i in range(count):
             best = population[int(np.random.uniform(0, population_size))]
-            best_score = self.evaluate(best)
+            best_score = best[1]
             for j in range(1, self.tournament_slots):
                 enemy = population[int(np.random.uniform(0, population_size))]
-                enemy_score = self.evaluate(enemy)
+                enemy_score = enemy[1]
                 if enemy_score < best_score:
                     best_score = enemy_score
                     best = enemy
@@ -43,8 +42,7 @@ class TournamentSelector(Selector):
 class ThresholdSelector(Selector):
     """Threshold selector implementation."""
 
-    def __init__(self, evaluator, threshold):
-        self.evaluate = evaluator
+    def __init__(self, threshold):
         self.threshold = threshold
 
     def select(self, population, count):
