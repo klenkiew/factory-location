@@ -6,7 +6,7 @@ from hill_climbing_algorithm import HillClimbingAlgorithm
 from logger import AggregateLogger, StdOutputLogger, NullLogger, PlotLogger, plt
 from location import Location2D
 from resource import Resource, ResourceRequirement
-from neighbourhood import create_gaussian_neighbour_gen, Constraints
+from neighbourhood import create_gaussian_neighbour_gen
 from evaluator import Evaluator
 from evolutionary_algorithm import EvolutionaryAlgorithmOptions, EvolutionaryAlgorithm, np
 from evolutionary_selection import ProportionalSelector, TournamentSelector, ThresholdSelector
@@ -127,15 +127,13 @@ def main():
     else:
         logger = NullLogger()
 
-    constraints = Constraints(resources_bounds[0], resources_bounds[2], resources_bounds[1], resources_bounds[3])
-
     if params["Algorithm"] == 0:
-        neighbour_gen = create_gaussian_neighbour_gen(params["Neighbourhood_size"], constraints,
-                                                      params["Neighbourhood_sigma"], params["Neighbourhood_mean"])
+        neighbour_gen = create_gaussian_neighbour_gen(params["Neighbourhood_size"], params["Neighbourhood_sigma"],
+                                                      params["Neighbourhood_mean"])
         algorithm = HillClimbingAlgorithm(evaluator, neighbour_gen, params["Stop_condition"], logger)
     else:
         options = EvolutionaryAlgorithmOptions(selector_obj, params["Population_size"], params["Crossover_probability"])
-        neighbourhood_gen = create_gaussian_neighbour_gen(1, constraints, params["Neighbourhood_sigma"],
+        neighbourhood_gen = create_gaussian_neighbour_gen(1, params["Neighbourhood_sigma"],
                                                           params["Neighbourhood_mean"])
         algorithm = EvolutionaryAlgorithm(evaluator, options,
                                           neighbourhood_gen,
