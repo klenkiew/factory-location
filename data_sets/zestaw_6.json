@@ -1,0 +1,172 @@
+{
+    "Resources": [
+        {
+            "Position": [
+                28.202360541584625,
+                75.64339807985449
+            ],
+            "Required_units": 1.6512071538512334,
+            "Transport_cost_func": "def f(x):\n    coefficients = [0, 1, 1]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(3)])"
+        },
+        {
+            "Position": [
+                85.25075511356897,
+                28.821211685292493
+            ],
+            "Required_units": 2.0457412446279366,
+            "Transport_cost_func": "def f(x):\n    coefficients = [0]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(1)])"
+        },
+        {
+            "Position": [
+                43.697174176512874,
+                23.122033789056694
+            ],
+            "Required_units": 3.5435922052515076,
+            "Transport_cost_func": "def f(x):\n    coefficients = [3, 3, 1, 0]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(4)])"
+        },
+        {
+            "Position": [
+                44.2047703476808,
+                41.70902629428254
+            ],
+            "Required_units": 1.3254502717517624,
+            "Transport_cost_func": "def f(x):\n    coefficients = []\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(0)])"
+        },
+        {
+            "Position": [
+                61.72493797719309,
+                19.4272669500132
+            ],
+            "Required_units": 1.7314739095959313,
+            "Transport_cost_func": "def f(x):\n    coefficients = [2, 2]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(2)])"
+        },
+        {
+            "Position": [
+                36.79195708063967,
+                23.11885211580328
+            ],
+            "Required_units": 3.003064918265199,
+            "Transport_cost_func": "def f(x):\n    coefficients = [2, 2, 3, 2]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(4)])"
+        },
+        {
+            "Position": [
+                36.35099345099043,
+                33.927747854130196
+            ],
+            "Required_units": 4.49725375993256,
+            "Transport_cost_func": "def f(x):\n    return min(1.114188515001096**(x*1.1310173085895716), 474)"
+        },
+        {
+            "Position": [
+                5.5550929750865174,
+                59.16323888758852
+            ],
+            "Required_units": 3.035222177157518,
+            "Transport_cost_func": "def f(x):\n    return min(1.4885194960821375**(x*1.4356891652073882), 912)"
+        },
+        {
+            "Position": [
+                15.972470485767044,
+                31.28317423559942
+            ],
+            "Required_units": 3.8608133477442257,
+            "Transport_cost_func": "def f(x):\n    coefficients = [1, 2, 2, 0, 1]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(5)])"
+        },
+        {
+            "Position": [
+                5.327447113191097,
+                20.98889018024952
+            ],
+            "Required_units": 3.0447766670467833,
+            "Transport_cost_func": "def f(x):\n    coefficients = [2, 1, 3]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(3)])"
+        },
+        {
+            "Position": [
+                68.59414734210705,
+                38.174247815139495
+            ],
+            "Required_units": 3.293807370335444,
+            "Transport_cost_func": "def f(x):\n    coefficients = [1, 0, 2]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(3)])"
+        },
+        {
+            "Position": [
+                83.54349276035448,
+                25.778858830732776
+            ],
+            "Required_units": 2.8127359218466754,
+            "Transport_cost_func": "def f(x):\n    coefficients = []\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(0)])"
+        },
+        {
+            "Position": [
+                94.34328360801328,
+                16.723168195924288
+            ],
+            "Required_units": 1.471076350206117,
+            "Transport_cost_func": "def f(x):\n    coefficients = [0, 0, 0]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(3)])"
+        },
+        {
+            "Position": [
+                53.09214324223078,
+                99.98528683474849
+            ],
+            "Required_units": 2.9989729391453133,
+            "Transport_cost_func": "def f(x):\n    coefficients = []\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(0)])"
+        },
+        {
+            "Position": [
+                40.72640108570735,
+                49.468240232334225
+            ],
+            "Required_units": 2.1057296706607733,
+            "Transport_cost_func": "def f(x):\n    return min(1.4617816620151505**(x*1.3255105569854355), 776)"
+        },
+        {
+            "Position": [
+                5.1034024482261025,
+                37.398380634718706
+            ],
+            "Required_units": 4.5752894133509106,
+            "Transport_cost_func": "def f(x):\n    coefficients = [2, 2, 0, 2, 0, 0]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(6)])"
+        },
+        {
+            "Position": [
+                39.78920997171777,
+                18.211852576327193
+            ],
+            "Required_units": 4.637580578261661,
+            "Transport_cost_func": "def f(x):\n    return min(1.4849459670844345**(x*1.4975030612286253), 881)"
+        },
+        {
+            "Position": [
+                8.765336448217177,
+                44.74022846779917
+            ],
+            "Required_units": 4.7267259083687545,
+            "Transport_cost_func": "def f(x):\n    coefficients = [2, 3, 2, 1, 1]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(5)])"
+        },
+        {
+            "Position": [
+                90.0024874987975,
+                44.917597071247094
+            ],
+            "Required_units": 1.03304172201265,
+            "Transport_cost_func": "def f(x):\n    coefficients = [2, 1, 1, 1, 1, 2]\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(6)])"
+        },
+        {
+            "Position": [
+                98.94005601467897,
+                57.481433101145676
+            ],
+            "Required_units": 1.3579574371478063,
+            "Transport_cost_func": "def f(x):\n    coefficients = []\n    return sum([coefficients[i]*(x**(i/3.0)) for i in range(0)])"
+        },
+        {
+            "Position": [
+                90.94005601467897,
+                90.481433101145676
+            ],
+            "Required_units": 1.3579574371478063,
+            "Transport_cost_func": "def f(x):\n    return min(2**(x*2), 10000)"
+        }
+    ]
+}
