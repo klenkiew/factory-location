@@ -175,6 +175,16 @@ def main():
     average_goal_func /= params["Tests_count"]
     print("Average goal function: {0:.4f}".format(average_goal_func))
 
+    # prepare to save as json
+    main_json = dict()
+    main_json[algorith_name] = []
+    for key, val in average_goal_func_after_evaluations.items():
+        value_json = dict()
+        value_json["X"] = key
+        value_json["Y"] = val
+        main_json[algorith_name].append(value_json)
+
+    json.dump(main_json, open(algorith_name + ".json", 'w'), indent=4)
 
 if __name__ == '__main__':
     main()
