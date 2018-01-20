@@ -1,16 +1,14 @@
 {
     "Tests_count": 20,
     "Enable_log": false,
-    "Algorithm": 1,
-    "Neighbourhood_size": 100,
-    "Neighbourhood_sigma": 1.0,
+    "Algorithm": 0,
+    "Neighbourhood_size": 20,
+    "Neighbourhood_sigma": 20.0,
     "Neighbourhood_mean": 0.0,
-    "Selection_method": 2,
+    "Selection_method": 0,
     "Tournament_size": 2,
     "Selection_threshold": 5,
-    "Population_size": 100,
-    "Reproduction_size": 99,
-    "Crossover_probability": 0.7,
-    "Stop_condition": "def cond(iteration, best, population, evaluations): return iteration > 10",
-    "Start_point": [-100.0, -100.0]
+    "Population_size": 20,
+    "Crossover_probability": 0.5,
+    "Stop_condition": "def cond(iteration, best, population, evaluations): return evaluations > 1000"
 }

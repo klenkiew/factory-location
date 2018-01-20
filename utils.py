@@ -61,9 +61,6 @@ def interactive_mode(params, ask_for_input_file):
             params["Tournament_size"] = int(input_with_check("Select tournament size: ", pip))
         if params["Selection_method"] == 2:
             params["Selection_threshold"] = int(input_with_check("Select selection threshold: ", pip))
-        params["Population_size"] = int(input_with_check("Select population size: ", pip))
         params["Reproduction_size"] = int(input_with_check("Select reproduction size: ", pip))
         params["Crossover_probability"] = float(input_with_check("Select crossover probability: ", prp))
         params["Iterations_count"] = int(input_with_check("Select iterations count: ", pip))
-    params["Start_point"][0] = float(input_with_check("Select starting point X: ", is_number))
-    params["Start_point"][1] = float(input_with_check("Select starting point Y: ", is_number))

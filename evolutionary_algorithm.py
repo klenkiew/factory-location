@@ -7,9 +7,8 @@ from algorithm import Algorithm, NullLogger, Location2D
 class EvolutionaryAlgorithmOptions(object):
     """Evolutionary algorithm parameters."""
 
-    def __init__(self, selector, population_size, reproduction_size, crossover_prob):
+    def __init__(self, selector, population_size, crossover_prob):
         self.population_size = population_size
-        self.reproduction_size = reproduction_size
         self.selector = selector
         self.crossover_probability = crossover_prob
 
@@ -55,7 +54,7 @@ class EvolutionaryAlgorithm(Algorithm):
         while not self.should_stop(iteration, [best, best_score], population, self.evaluator.evaluations):
             self.logger.next_iteration(iteration, best, best_score)
             reproduced = []
-            for i in range(self.options.reproduction_size):
+            for i in range(self.options.population_size - 1):
                 if np.random.uniform() < self.options.crossover_probability:
                     to_cross = self.options.selector.select(population, 2)
                     new_subject = self.mutation(self.crossover(to_cross[0], to_cross[1]))

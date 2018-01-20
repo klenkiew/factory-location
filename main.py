@@ -8,7 +8,7 @@ from location import Location2D
 from resource import Resource, ResourceRequirement
 from neighbourhood import create_gaussian_neighbour_gen
 from evaluator import Evaluator
-from evolutionary_algorithm import EvolutionaryAlgorithmOptions, EvolutionaryAlgorithm
+from evolutionary_algorithm import EvolutionaryAlgorithmOptions, EvolutionaryAlgorithm, np
 from evolutionary_selection import ProportionalSelector, TournamentSelector, ThresholdSelector
 from utils import interactive_mode
 
@@ -22,7 +22,6 @@ def main():
     params["Enable_log"] = False
     params["Algorithm_config_file"] = False
     params["Algorithm"] = 0
-    params["Start_point"] = [0, 0]
     params["Neighbourhood_size"] = 100
     params["Neighbourhood_sigma"] = 1.0
     params["Neighbourhood_mean"] = 0.0
@@ -82,6 +81,9 @@ def main():
             print("Cannot open " + params["Algorithm_config_file"] + " file!")
             return
 
+    # resources boundaries
+    resources_bounds = [1000000, 1000000, -1000000, -1000000]
+
     print("Loading resources from: " + params["Input_file"])
     try:
         resources_json = json.load(open(params["Input_file"], 'r'))
@@ -89,10 +91,20 @@ def main():
             func_dict = dict()
             exec(res["Transport_cost_func"], func_dict)
             params["Resources"].append(ResourceRequirement(Resource(Location2D(res["Position"][0], res["Position"][1]), func_dict["f"]), res["Required_units"]))
+            if res["Position"][0] < resources_bounds[0]:
+                resources_bounds[0] = res["Position"][0]
+            if res["Position"][0] > resources_bounds[2]:
+                resources_bounds[2] = res["Position"][0]
+            if res["Position"][1] < resources_bounds[1]:
+                resources_bounds[1] = res["Position"][1]
+            if res["Position"][1] > resources_bounds[3]:
+                resources_bounds[3] = res["Position"][1] 
     except FileNotFoundError:
         print("Cannot open " + params["Input_file"] + " file!")
         return
     print("Loaded " + str(len(params["Resources"])) + " resources!")
+    print("Resources position boundaries (x_min, y_min, x_max, y_max): ({0:.2f}, {1:.2f}, {2:.2f}, {3:.2f})"
+          .format(resources_bounds[0], resources_bounds[1], resources_bounds[2], resources_bounds[3]))
 
     evaluator = Evaluator(params["Resources"])
     plot_logger = PlotLogger()
@@ -120,8 +132,7 @@ def main():
                                           create_gaussian_neighbour_gen(params["Neighbourhood_size"], params["Neighbourhood_sigma"], params["Neighbourhood_mean"]),
                                           params["Stop_condition"], logger)
     else:
-        options = EvolutionaryAlgorithmOptions(selector_obj, params["Population_size"], params["Reproduction_size"],
-                                               params["Crossover_probability"])
+        options = EvolutionaryAlgorithmOptions(selector_obj, params["Population_size"], params["Crossover_probability"])
         algorithm = EvolutionaryAlgorithm(evaluator, options,
                                         create_gaussian_neighbour_gen(1, params["Neighbourhood_sigma"], params["Neighbourhood_mean"]),
                                         params["Stop_condition"], logger)
@@ -131,7 +142,9 @@ def main():
     print("Running tests...")
     for i in range(params["Tests_count"]):
         logger.clear()
-        results.append(algorithm.run(Location2D(params["Start_point"][0], params["Start_point"][1])))
+        start_point = Location2D(np.random.uniform(resources_bounds[0], resources_bounds[2]),
+                                 np.random.uniform(resources_bounds[1], resources_bounds[3]))
+        results.append(algorithm.run(start_point))
         average_goal_func += results[i][1]
         if params["Enable_log"]:
             print("Best location: ({}, {}) [{}]".format(results[i][0].position_x,
