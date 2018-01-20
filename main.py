@@ -146,6 +146,7 @@ def main():
     print("Running tests...")
     for i in range(params["Tests_count"]):
         logger.clear()
+        evaluator.evaluations = 0
         start_point = Location2D(np.random.uniform(resources_bounds[0], resources_bounds[2]),
                                  np.random.uniform(resources_bounds[1], resources_bounds[3]))
         if params["Algorithm"] == 0:
