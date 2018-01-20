@@ -59,27 +59,19 @@ def generate_random_resources(args):
 
 def get_random_function_string():
     """Returns random function."""
-    function_type = random.randint(0, 2)
-    if function_type == 0:
-        # linear function with random coefficients
-        a = random.randint(0, 10)
-        b = random.randint(0, 10)
-        return "def f(x): return x*{}+{}".format(a, b)
-    elif function_type == 1:
-        # polynomial function
-        power = random.randint(0, 10)
-        return create_polynomial_function_string(power)
-    else:
-        # root function
-        a = random.randint(0, 10)
-        return "def f(x): return {}*x**0.5".format(a)
+    # polynomial function
+    power = random.randint(0, 6)
+    return create_polynomial_function_string(power) if random.randint(0, 3) != 0 else create_func(random.uniform(1, 1.5), random.uniform(1, 1.5), random.randint(10, 1000))
 
 
 # power has to be an integer number
 def create_polynomial_function_string(power):
-    """Creates polynomial function string."""
-    coefficients_string = "    coefficients = [" + str.join(', ', [str(random.randint(0, 10)) for _ in range(power)]) + "]\n"
+    coefficients_string = "    coefficients = [" + str.join(', ', [str(random.randint(0, 3)) for _ in range(power)]) + "]\n"
     return "def f(x):\n" + coefficients_string + "    return sum([coefficients[i]*(x**(i/3.0)) for i in range({})])".format(power)
+
+
+def create_func(a, b, c):
+    return "def f(x):\n    return min({}**(x*{}), {})".format(a, b, c)
 
 
 if __name__ == "__main__":
