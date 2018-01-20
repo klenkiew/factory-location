@@ -34,10 +34,11 @@ class EvolutionaryAlgorithm(Algorithm):
     def run(self, start_point=Location2D()):
         iteration = 1
 
-        # initialize population with neighbours of start_point
+        # initialize population with random points
         population = []
         for i in range(self.options.population_size):
-            new_subject = self.mutation(start_point)
+            new_subject = Location2D(np.random.uniform(start_point[0], start_point[2]),
+                                     np.random.uniform(start_point[1], start_point[3]))
             new_score = self.evaluate(new_subject)
             population.append([new_subject, new_score])
             if i == 0:

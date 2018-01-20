@@ -1,7 +1,7 @@
 {
     "Tests_count": 20,
     "Enable_log": false,
-    "Algorithm": 0,
+    "Algorithm": 1,
     "Neighbourhood_size": 20,
     "Neighbourhood_sigma": 20.0,
     "Neighbourhood_mean": 0.0,

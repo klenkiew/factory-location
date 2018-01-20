@@ -148,7 +148,10 @@ def main():
         logger.clear()
         start_point = Location2D(np.random.uniform(resources_bounds[0], resources_bounds[2]),
                                  np.random.uniform(resources_bounds[1], resources_bounds[3]))
-        results.append(algorithm.run(start_point))
+        if params["Algorithm"] == 0:
+            results.append(algorithm.run(start_point))
+        else:
+            results.append(algorithm.run(resources_bounds))
         average_goal_func += results[i][1]
         if params["Enable_log"]:
             print("Best location: ({}, {}) [{}]".format(results[i][0].position_x,
