@@ -38,7 +38,7 @@ def main():
     pl.title("Algorithms comparison")
     pl.legend()
     pl.xlabel("Evaluations")
-    pl.ylabel("Average goal function")
+    pl.ylabel("Average cost function")
     pl.show()
 
 if __name__ == "__main__":
