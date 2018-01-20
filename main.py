@@ -1,9 +1,10 @@
 """Module with entry point for factory localization optimizer."""
 import sys
 import json
+from statistics import mean
 
 from hill_climbing_algorithm import HillClimbingAlgorithm
-from logger import AggregateLogger, StdOutputLogger, NullLogger, PlotLogger, plt
+from logger import AggregateLogger, StdOutputLogger, NullLogger, PlotLogger, plt, StatisticsLogger
 from location import Location2D
 from resource import Resource, ResourceRequirement
 from neighbourhood import create_gaussian_neighbour_gen
@@ -98,7 +99,7 @@ def main():
             if res["Position"][1] < resources_bounds[1]:
                 resources_bounds[1] = res["Position"][1]
             if res["Position"][1] > resources_bounds[3]:
-                resources_bounds[3] = res["Position"][1] 
+                resources_bounds[3] = res["Position"][1]
     except FileNotFoundError:
         print("Cannot open " + params["Input_file"] + " file!")
         return
@@ -122,10 +123,11 @@ def main():
     else:
         algorith_name = "Evolutionary algorithm"
 
+    stats_logger = StatisticsLogger()
     if params["Enable_log"]:
-        logger = AggregateLogger([StdOutputLogger(algorith_name), plot_logger])
+        logger = AggregateLogger([StdOutputLogger(algorith_name), plot_logger, stats_logger])
     else:
-        logger = NullLogger()
+        logger = stats_logger
 
     if params["Algorithm"] == 0:
         neighbour_gen = create_gaussian_neighbour_gen(params["Neighbourhood_size"], params["Neighbourhood_sigma"],
@@ -138,7 +140,6 @@ def main():
         algorithm = EvolutionaryAlgorithm(evaluator, options,
                                           neighbourhood_gen,
                                           params["Stop_condition"], logger)
-
     results = []
     average_goal_func = 0.0
     print("Running tests...")
@@ -169,6 +170,7 @@ def main():
             plt.title("Resources and factory location")
             plt.show()
 
+    average_goal_func_after_evaluations = {key: mean(value) for key, value in stats_logger.stats.items()}
 
     average_goal_func /= params["Tests_count"]
     print("Average goal function: {0:.4f}".format(average_goal_func))

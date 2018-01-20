@@ -14,7 +14,7 @@ class HillClimbingAlgorithm(Algorithm):
         iteration_count = 1
         while not self.should_stop(iteration_count, [best, best_score], neighbourhood, self.evaluator.evaluations):
             neighbourhood = []
-            self.logger.next_iteration(iteration_count, best, best_score)
+            self.logger.next_iteration(iteration_count, best, best_score, self.evaluator.evaluations)
             point_neighbourhood = self.neighbourhood_generator(best)
             for neighbour in point_neighbourhood:
                 current_node_score = self.evaluate(neighbour)
