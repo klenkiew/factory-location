@@ -15,7 +15,7 @@ class ProportionalSelector(Selector):
         population_size = len(population)
         selected = []
         for i in range(count):
-            selected.append(population[random.randint(0, population_size)])
+            selected.append(population[random.randint(0, population_size-1)])
         return selected
 
 class TournamentSelector(Selector):
@@ -28,10 +28,10 @@ class TournamentSelector(Selector):
         population_size = len(population)
         selected = []
         for i in range(count):
-            best = population[random.randint(0, population_size)]
+            best = population[random.randint(0, population_size-1)]
             best_score = best[1]
             for j in range(1, self.tournament_slots):
-                enemy = population[random.randint(0, population_size)]
+                enemy = population[random.randint(0, population_size-1)]
                 enemy_score = enemy[1]
                 if enemy_score < best_score:
                     best_score = enemy_score
